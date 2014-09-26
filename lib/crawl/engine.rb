@@ -5,6 +5,7 @@ class Crawl::Engine
                      :start => ['/'],
                      :username => '',
                      :password => '',
+                     :query => '',
                      :verbose => false,
                      :session_id => false}
 
@@ -14,12 +15,16 @@ class Crawl::Engine
   MAX_REDIRECTS = 3
   LINE_WIDTH = 78
 
-  attr_reader :options
+  attr_reader :options, :query
 
   def initialize(caller_options = {})
     @options = DEFAULT_OPTIONS.merge(caller_options)
     @authorization = Base64.encode64("#{options[:username]}:#{options[:password]}")
     @register = Crawl::Register.new
+
+    if @options[:query] && options[:query] != ''
+      @query = Regexp.new(options[:query], Regexp::IGNORECASE)
+    end
 
     start_pages = options[:start].to_a.map{|page| Page.new(@register, page, 'the command line')}
 
@@ -48,6 +53,10 @@ class Crawl::Engine
 
   def errors?
     @register.errors?
+  end
+
+  def query_result?
+
   end
 
   def no_links_found?
@@ -103,6 +112,7 @@ private
     anchors.reject!{|anchor| anchor['class'].to_s =~ /unobtrusive_/}
     anchors.reject!{|anchor| anchor['rel'].to_s =~ /nofollow/}
     raw_links = anchors.map{|anchor| anchor['href']}
+    page.query_found! if query && doc.text =~ query
     raw_links.compact!
     raw_links.map!{|link| link.sub(options[:domain], '')}
     raw_links.delete_if{|link| link =~ %r{^http(s)?://} && !link.include?(options[:domain])}

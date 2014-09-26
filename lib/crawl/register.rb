@@ -45,16 +45,31 @@ class Crawl::Register
   end
 
   def error_pages
-    @processed.select{ |page| page.error }
+    @error_pages ||= @processed.select{ |page| page.error }
+  end
+
+  def query_pages
+    @query_pages ||= @processed.select{ |page| page.query? }
   end
 
   def errors?
     !error_pages.empty?
   end
 
+  def query_pages?
+    !query_pages.empty?
+  end
+
   def summarize
     if errors?
-      puts "\nPages with errors:"
+      puts "\n#{@processed.size} pages crawled."
+      if query_pages?
+        puts "\n Pages with query matching"
+        query_pages.each do |page|
+          puts page.to_s
+        end
+      end
+      puts "\nPages with errors (#{error_pages.size}):"
       error_pages.each do |page|
         puts page.to_s
       end

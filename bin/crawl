@@ -9,6 +9,7 @@ optparse = OptionParser.new do |opts|
   opts.on('-u', '--username username', String, 'Basic auth username') { |o| options[:username] = o }
   opts.on('-p', '--password password', String, 'Basic auth password') { |o| options[:password] = o }
   opts.on('-v', '--verbose', 'Give details when crawling') { |o| $verbose = o }
+  opts.on('-q', '--query query', String, 'List pages matching a query'){ |o| options[:query] = o}
   opts.on_tail("-h", "--help", "Show this message") { |o| puts opts; exit }
   opts.on_tail("-v", "--version", "Print version") { |o| puts Crawl::VERSION; exit }
 end.parse!

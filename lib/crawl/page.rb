@@ -1,7 +1,7 @@
 class Page
   include Comparable
 
-  attr_reader :register, :url, :source, :error
+  attr_reader :register, :url, :source, :error, :query
 
   ATTEMPTS = 3
 
@@ -28,6 +28,14 @@ class Page
   def success
     @error = nil
     @register.completed(self)
+  end
+
+  def query_found!(query = true)
+    @query = query
+  end
+
+  def query?
+    !!@query
   end
 
   def fatal(error)
